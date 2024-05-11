@@ -25,7 +25,37 @@ services:
             - <persistent-config-path-cups>:/etc/cups
             - <persistent-config-path-printnode>:/root/.printnode/printnode
 ```
+## Run the print server with additional cmd
+```yaml
+version: "3.3"
+services:
+  printnode:
+    image: butopea/printnode-docker
+    restart: always
+    ports:
+      - "631:631"
+      - "8881:8888"
+    environment:
+      - CUPSADMIN=print
+      - CUPSPASSWORD=print
+      - PRINT_CLIENT_EMAIL=print@print.de
+      - PRINT_CLIENT_PASSWORD=printprint
+      - TZ="Asia/Kuwait"
+    volumes:
+      - ./cups:/etc/cups
+      - ./printnode:/root/.printnode/printnode
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    networks:
+      grapthemall:
+        ipv4_address: 172.20.10.27
+    command: /usr/local/PrintNode/PrintNode --computer-name $PRINTNODE_HOSTNAME --headless --web-interface --use-environment-variables --new-option
 
+networks:
+  grapthemall:
+    external: true
+
+```
 ### Parameters and defaults
 - `cmd`: by default it starts printnode with following options `--computer-name $PRINTNODE_HOSTNAME --headless --web-interface --use-enviroment-variables`. Add cmd `/usr/local/PrintNode/PrintNode --your-options` to add more but keep the default ones within command to be functional
 - `ports`: default cups network port `631:631`. Recommended to change if host has alreacy another cups server running. `8888` is the webinterface for Printnode
